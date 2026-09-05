@@ -85,7 +85,7 @@ SoftAP信息：
 
 ## 完整连接过程抓包
 
-![image-20260905222659881](/home/rookie/01-Custom/01_github/WiFiDevelopmentNotes/01_The_Process_Of_Station_Connecting_SoftAP/assets/complete_process_of_station_connect_softap.png)
+![complete_process_of_station_connect_softap](./assets/complete_process_of_station_connect_softap.png)
 
 
 
@@ -103,7 +103,7 @@ Station 通过监听 Beacon 来发现附近的 AP/SoftAP
     | ---- Beacon ----> Station
 ```
 
-![image-20260905222839232](/home/rookie/01-Custom/01_github/WiFiDevelopmentNotes/01_The_Process_Of_Station_Connecting_SoftAP/assets/passive_scan_beacon.png)
+![passive_scan_beacon](./assets/passive_scan_beacon.png)
 
 
 
@@ -119,7 +119,7 @@ Station                     SoftAP
    |                           |
 ```
 
-![image-20260905223139310](/home/rookie/01-Custom/01_github/WiFiDevelopmentNotes/01_The_Process_Of_Station_Connecting_SoftAP/assets/active_scan_probe.png)
+![active_scan_probe](./assets/active_scan_probe.png)
 
 
 
@@ -132,7 +132,7 @@ Station                         SoftAP
    | <-- Authentication Response --|
 ```
 
-![image-20260905223252946](/home/rookie/01-Custom/01_github/WiFiDevelopmentNotes/01_The_Process_Of_Station_Connecting_SoftAP/assets/authentication.png)
+![authentication](./assets/authentication.png)
 
 Authentication 并不是我们通常理解的“输入 Wi-Fi 密码进行身份验证”。
 
@@ -151,7 +151,7 @@ Station                    SoftAP
    | <-- Association Resp --- |
 ```
 
-![image-20260905223508022](/home/rookie/01-Custom/01_github/WiFiDevelopmentNotes/01_The_Process_Of_Station_Connecting_SoftAP/assets/association.png)
+![association](./assets/association.png)
 
 
 
@@ -166,7 +166,7 @@ Station                   SoftAP
    | ------- EAPOL 4 ------->|
 ```
 
-![image-20260905231903284](/home/rookie/01-Custom/01_github/WiFiDevelopmentNotes/01_The_Process_Of_Station_Connecting_SoftAP/assets/4-way-handshake.png)
+![4-way-handshake](./assets/4-way-handshake.png)
 
 
 
@@ -181,7 +181,7 @@ Station                    SoftAP
    | <------ DHCP ACK --------|
 ```
 
-![image-20260905231947007](/home/rookie/01-Custom/01_github/WiFiDevelopmentNotes/01_The_Process_Of_Station_Connecting_SoftAP/assets/dhcp.png)
+![dhcp](./assets/dhcp.png)
 
 
 
