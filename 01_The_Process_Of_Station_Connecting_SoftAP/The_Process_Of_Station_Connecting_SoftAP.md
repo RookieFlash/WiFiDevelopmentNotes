@@ -1,3 +1,9 @@
+# Station连接SoftAP到底经历了哪些过程？
+
+*******************************************************************************
+
+
+
 打开手机 Wi-Fi，选择一个热点并成功连接。
 
 从用户的角度来看，只是“点击热点 → 输入密码 → 连接成功”几个简单操作。
@@ -16,7 +22,7 @@
 
 
 
-# Station 和 SoftAP 是什么？
+## Station 和 SoftAP 是什么？
 | 术语         | 含义                | 简单理解                     |
 | :---------: | :-----------------: | :-----------------------: |
 | Station（STA）| Wi-Fi 中的客户端角色  | 连接 AP 的终端设备            |
@@ -55,7 +61,7 @@
 
 
 
-# Station 连接 SoftAP 的完整过程
+## Station 连接 SoftAP 的完整过程
 
 ```
 Station                    SoftAP
@@ -100,7 +106,7 @@ Station                    SoftAP
 
 
 
-# 抓 WiFi 空口的环境信息
+## 抓 WiFi 空口的环境信息
 ```
 Sniffer 平台：Ubuntu 22.04
 Sniffer 工具：aircrack-ng / airodump-ng / Wireshark
@@ -122,9 +128,9 @@ SoftAP信息：
 
 
 
-# WiFi 空口 
+## WiFi 空口 
 
-## 完整连接过程抓包
+### 完整连接过程抓包
 
 ![complete_process_of_station_connect_softap](./assets/complete_process_of_station_connect_softap.png)
 
@@ -134,7 +140,7 @@ SoftAP信息：
 > 为了便于展示完整流程，下面的示意图将两种发现方式都画出来。
 
 
-### Frame 类型
+#### Frame 类型
 | 阶段 | 802.11 报文/帧 | 方向 | 主要作用 |
 | :---: | :--- | :---: | :--- |
 | ① | Beacon | AP → STA | AP 周期性广播自身信息 |
@@ -152,9 +158,9 @@ SoftAP信息：
 
 
 
-## 第一阶段：扫描(Scan)发现 AP/SoftAP
+### 第一阶段：扫描(Scan)发现 AP/SoftAP
 
-### 被动发现 AP/SoftAP - Beacon
+#### 被动发现 AP/SoftAP - Beacon
 
 Station 通过监听 Beacon 来发现附近的 AP/SoftAP
 
@@ -170,7 +176,7 @@ Station                    SoftAP
 
 
 
-### 主动发现 AP/SoftAP - Probe Request / Probe Response
+#### 主动发现 AP/SoftAP - Probe Request / Probe Response
 
 Station通过主动发送Probe Request来发现附近的 AP/SoftAP
 
@@ -186,7 +192,7 @@ Station                     SoftAP
 
 
 
-## 第二阶段：认证(Authentication)
+### 第二阶段：认证(Authentication)
 
 ```
 Station                         SoftAP
@@ -211,7 +217,7 @@ Station 和 AP 先完成 802.11 层面的 Authentication，为后续的 Associat
 
 
 
-## 第三阶段：关联(Association)
+### 第三阶段：关联(Association)
 
 ```
 Station                    SoftAP
@@ -233,7 +239,7 @@ Association 成功后，AP 与 Station 就建立了关联关系。
 
 
 
-## 第四阶段：四次握手(4-Way Handshake)
+### 第四阶段：四次握手(4-Way Handshake)
 
 ```
 Station                   SoftAP
@@ -255,7 +261,7 @@ Station 和 AP 还需要进行 4-Way Handshake。
 
 
 
-## 第五阶段：DHCP 获取 IP
+### 第五阶段：DHCP 获取 IP
 
 ```
 Station                   DHCP Server
@@ -286,7 +292,7 @@ AP 是提供 Wi-Fi 接入能力的角色，DHCP Server 是负责分配 IP 网络
 
 
 
-## 第六阶段：数据通信
+### 第六阶段：数据通信
 
 ```
 ┌───────────────────────┐
@@ -323,7 +329,7 @@ Wi-Fi（802.11）
 
 
 
-# 从 Sniffer 抓包重新看整个过程
+## 从 Sniffer 抓包重新看整个过程
 
 ```
     Station 连接 SoftAP
@@ -380,7 +386,7 @@ Wi-Fi（802.11）
 
 
 
-# 为什么 Sniffer 抓包可能看不到完整流程？
+## 为什么 Sniffer 抓包可能看不到完整流程？
 
 实际抓包时，不一定能够看到本文示意图中的所有报文。
 
