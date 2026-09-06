@@ -31,7 +31,7 @@
 
        Station                              SoftAP
      ┌─────────┐                          ┌─────────┐
-     │ 手机/PC  │       802.11 Wi-Fi       │ 路由器  │
+     │ 手机/PC  │       802.11 Wi-Fi       │ 路由器 / │
      │         │ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─  │ SoftAP  │
      └─────────┘                          └─────────┘
 ```
@@ -91,6 +91,7 @@ Station                    SoftAP
 | ③       | Association          | STA(Station) 与 AP 建立关联            |
 | ④       | 4-Way Handshake      | 协商并建立数据加密所需的密钥               |
 | ⑤       | DHCP                 | STA 获取 IP 地址等网络参数                 |
+| ⑥       | Data                 | STA 与 AP/SoftAP 之间的数据通信           |
 
 
 
