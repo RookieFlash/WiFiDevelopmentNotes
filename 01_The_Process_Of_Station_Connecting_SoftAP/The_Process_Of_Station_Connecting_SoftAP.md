@@ -373,6 +373,29 @@ Wi-Fi（802.11）
     └───────────────────┘
 ```
 
+简化后的流程
+
+```
+Station                    SoftAP
+   |                          |
+   | <------- 发现 AP -------> |
+   |                          |
+   | <--- Authentication ---> |
+   |                          |
+   | <---- Association -----> |
+   |                          |
+   | <--- 4-Way Handshake --> |
+   |                          |
+   | <-------- DHCP --------> |
+   |                          |
+   | <===== 正常数据通信 =====> |
+```
+
+```
+发现 AP → Authentication → Association → 4-Way Handshake → DHCP → IP 通信
+```
+
+
 > 到这里可以先记住一个最核心的概念：
 >
 > **Wi-Fi 连接解决的是“怎么加入这个 Wi-Fi 网络”，
