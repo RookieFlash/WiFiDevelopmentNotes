@@ -48,20 +48,38 @@ Beacon 可以理解成 SoftAP 周期性发送一张“自我介绍”。例如�
 ...
 ```
 
-在 802.11 网络中，SoftAP 会周期性(约102ms)发送 Beacon Frame，STA 可以通过接受 Beacon 了解附近 BSS 的基本信息。
+SoftAP 会按照 Beacon Interval 周期性发送 Beacon Frame。
+Beacon Interval 的单位是 TU（Time Unit），常见配置为 100 TU，也就是约 102.4 ms。
+STA 可以通过接收到的 Beacon 了解附近 BSS 的基本信息。
+```
+1 TU = 1024 μs
+
+100 TU = 102400 μs
+       = 102.4 ms
+```
+
 
 ### Beacon 长什么样子
+
 ![beacon](./assets/beacon.png)
 
-| 字段             | 简单理解为       |
-| --------------- | ------------ |
-| SSID            | Wi-Fi 名称      |
-| BSSID           | SoftAP 的 MAC 地址  |
-| Beacon Interval | Beacon 发送间隔   |
-| RSN             | 安全相关信息       |
-| HT/VHT/HE       | AP 支持的 Wi-Fi 能力 |
+| 信息                  | 用途              |
+| -------------------- | --------------- |
+| SSID                 | 网络名称            |
+| BSSID                | AP/BSS 的 MAC 地址 |
+| Channel / Frequency  | AP 工作在哪个信道/频率   |
+| Beacon Interval      | Beacon 周期       |
+| Capability           | BSS 的基本能力       |
+| RSN                  | WPA2/WPA3 等安全能力 |
+| HT                   | 802.11n 能力      |
+| VHT                  | 802.11ac 能力     |
+| HE                   | 802.11ax 能力     |
+| Country / Regulatory | 国家/区域相关信息       |
+| Supported Rates      | 支持的数据速率         |
+
 
 > Beacon 中还有大量 Information Elements（IE），本文暂时不逐个展开，后续会单独分析。
+
 
 *******************************************************************************
 *******************************************************************************
@@ -96,9 +114,9 @@ STA 也可以主动发送 Probe Request，询问附近的 SoftAP
 
 有明确目标地询问：“‘TesttAP’这个网络在不在附近？”
 
-- 目的地址：虽然标准流程中通常也是广播地址，但它的核心特征是携带了特定的 SSID。
+- 目的地址：可以是广播地址，也可以是特定的目的 MAC 地址，具体取决于实现。
 - SSID 字段：包含客户端想要寻找的那个具体的网络名称。
-- 用途：通常用于快速连接之前连接过的、已保存的网络
+- 用途：用于主动寻找指定 SSID 的网络。
 - Wireshark 过滤表达式：wlan.fc.type_subtype == 0x04 && wlan.ssid == "TestAP"
 
 ![probe_request_directed](./assets/probe_request_directed.png)
@@ -164,7 +182,46 @@ Station                    SoftAP
 *******************************************************************************
 *******************************************************************************
 
-## 8. 从 Sniffer 抓包完整看一次扫描
+## 8. 一次扫描实际上是怎么进行的？
+
+- 对于 2.4GHz 来说，扫描的大致过程如下
+```
+STA
+ │
+ │ ① 选择待扫描信道
+ ↓
+Channel 1
+ │
+ │ ② Passive Scan
+ │   监听 Beacon
+ │
+ │ ③ / 或 Active Scan
+ │   Probe Request
+ │
+ │ ← Probe Response
+ │
+ ↓
+Channel 6
+ │
+ │ 继续扫描
+ ↓
+Channel 11
+ │
+ │ 继续扫描
+ ↓
+扫描完成
+ │
+ ↓
+得到 Scan Results
+```
+
+> 实际设备不一定按照上面的顺序逐个信道执行，具体扫描策略由 Android、Wi-Fi HAL、驱动和固件实现决定。
+
+
+*******************************************************************************
+*******************************************************************************
+
+## 9. 从 Sniffer 抓包看一次扫描
 
 ![beacon_probe](./assets/beacon_probe.png)
 
@@ -187,7 +244,20 @@ Station                    SoftAP
 *******************************************************************************
 *******************************************************************************
 
-## 9. 总结
+## 10. 隐藏热点
+
+- 隐藏热点广播的 Beacon 中 SSID 为空。
+
+![beacon_hidden_softap](./assets/beacon_hidden_softap.png)
+
+
+- STA 通过发送 Wildcard Probe Request - 广播 Probe Request，隐藏热点收到 Probe Request 之后是不会回复 Probe Response 的。
+
+
+*******************************************************************************
+*******************************************************************************
+
+## 11. 总结
 
 ```
          Station发现SoftAP
@@ -203,19 +273,8 @@ Station                    SoftAP
       │            Probe Response
       └─────────┬─────────┘
                 ↓
-            发现SoftAP
-                │
-                ↓
-          Authentication
-                │
-                ↓
-          Association
-                │
-                ↓
-         4-Way Handshake
-                │
-                ↓
-               DHCP
+            Scan Results
+
 ```
 
 *******************************************************************************
