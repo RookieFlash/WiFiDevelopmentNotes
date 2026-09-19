@@ -9,6 +9,20 @@
 主动扫描：手机在支持的信道上轮询发送 Probe Request，等待 SoftAP 回复 Probe Response 主动发现附近的 Wi-Fi热点。
 被动扫描：手机在支持的信道上轮询监听 SoftAP 周期性广播的 Beacon 来发现 Wi-Fi热点。
 
+```
+STA 想发现 SoftAP
+      │
+      ├── Passive Scan
+      │       ↓
+      │     Beacon
+      │
+      └── Active Scan
+              ↓
+        Probe Request
+              ↓
+        Probe Response
+```
+
 *******************************************************************************
 *******************************************************************************
 
@@ -28,7 +42,7 @@ SoftAP 可以通过 Beacon 主动“广播自己的存在”，STA也可以通�
 *******************************************************************************
 *******************************************************************************
 
-## 3. Beacon：SoftAP 主动告诉啊别人“我在这里”
+## 3. Beacon：SoftAP 主动告诉别人“我在这里”
 
 ```
 Station                    SoftAP
@@ -98,9 +112,9 @@ STA 也可以主动发送 Probe Request，询问附近的 SoftAP
 
 ### Probe Request 长什么样子
 
-#### Probe Request - Wildcard - 广播 Probe Request
+#### Wildcard Probe Request - 广播 Probe Request
 
-不指定任何特定的 SSID，相当于客户端在“广撒网”式地询问周围的 AP：“谁在？有哪些网络？”
+不指定任何特定的 SSID，相当于客户端在“广撒网”式地询问当前信道上的 AP：“谁在？有哪些网络？”
 
 - 目的地址：通常是广播地址 ff:ff:ff:ff:ff:ff。
 - SSID 字段：通配符或留空。
@@ -110,9 +124,9 @@ STA 也可以主动发送 Probe Request，询问附近的 SoftAP
 ![probe_request_wildcast](./assets/probe_request_wildcast.png)
 
 
-#### Probe Request - Directed - 定向 Probe Request
+#### Directed Probe Request - 定向 Probe Request
 
-有明确目标地询问：“‘TesttAP’这个网络在不在附近？”
+有明确目标地在当前信道上询问：“‘TesttAP’这个网络在不在附近？”
 
 - 目的地址：可以是广播地址，也可以是特定的目的 MAC 地址，具体取决于实现。
 - SSID 字段：包含客户端想要寻找的那个具体的网络名称。
@@ -186,33 +200,24 @@ Station                    SoftAP
 
 - 对于 2.4GHz 来说，扫描的大致过程如下
 ```
-STA
- │
- │ ① 选择待扫描信道
- ↓
-Channel 1
- │
- │ ② Passive Scan
- │   监听 Beacon
- │
- │ ③ / 或 Active Scan
- │   Probe Request
- │
- │ ← Probe Response
- │
- ↓
-Channel 6
- │
- │ 继续扫描
- ↓
-Channel 11
- │
- │ 继续扫描
- ↓
-扫描完成
- │
- ↓
-得到 Scan Results
+Wi-Fi Scan
+    │
+    │ ① 选择待扫描信道
+    ├── Channel 1
+    │     ├── Listen Beacon - 监听 Beacon				② Passive Scan
+    │     └── Probe Request/Response - 发/收Probe		③ 或 Active Scan
+    │
+    ├── Channel 6
+    │     ├── Listen Beacon
+    │     └── Probe Request/Response
+    │
+    ├── Channel 11
+    │     ├── Listen Beacon
+    │     └── Probe Request/Response
+    │
+    └── ...
+    │
+    └── Scan Results
 ```
 
 > 实际设备不一定按照上面的顺序逐个信道执行，具体扫描策略由 Android、Wi-Fi HAL、驱动和固件实现决定。
@@ -222,6 +227,10 @@ Channel 11
 *******************************************************************************
 
 ## 9. 从 Sniffer 抓包看一次扫描
+
+下面通过一组实际抓包，观察 Wi-Fi Scan 中可能出现的 Beacon、Probe Request 和 Probe Response。
+
+> 需要注意的是，实际帧的出现顺序会受到扫描策略、信道、AP 行为以及设备实现的影响，并不存在下面这种固定的帧顺序。
 
 ![beacon_probe](./assets/beacon_probe.png)
 
@@ -244,20 +253,68 @@ Channel 11
 *******************************************************************************
 *******************************************************************************
 
-## 10. 隐藏热点
+## 10. Android 中的 Wi-Fi Scan
 
-- 隐藏热点广播的 Beacon 中 SSID 为空。
+```
+Android App / Settings
+          │
+          ↓
+      WifiManager
+          │
+          ↓
+ Android Wi-Fi Framework
+          │
+          ↓
+        Wi-Fi HAL
+          │
+          ↓
+       nl80211
+          │
+          ↓
+ cfg80211 / Qualcomm Driver
+          │
+          ↓
+       Firmware
+          │
+          ↓
+       Wi-Fi Chip
+          │
+          ↓
+     Beacon / Probe
+```
+
+本文介绍的是 802.11 空口层面的 Wi-Fi Scan。
+在 Android 中，应用通常不会直接发送 Probe Request，而是通过 Android Wi-Fi Framework 发起扫描请求，底层再由 HAL、驱动和固件等组件共同完成实际扫描。不同平台的具体实现可能不同。
+
+
+*******************************************************************************
+*******************************************************************************
+
+## 11. 隐藏热点
+
+### 普通热点广播的 Beacon 中 SSID 为热点名称
+
+![beacon](./assets/beacon.png)
+
+
+### 隐藏热点广播的 Beacon 中 SSID 为空。
 
 ![beacon_hidden_softap](./assets/beacon_hidden_softap.png)
 
 
+### 如何发现隐藏热点
+
 - STA 通过发送 Wildcard Probe Request - 广播 Probe Request，隐藏热点收到 Probe Request 之后是不会回复 Probe Response 的。
 
 
+- **STA 可以通过指定 SSID 的 Directed Probe Request 来寻找隐藏网络**。
+
+![probe_request_directed](./assets/probe_request_directed.png)
+
 *******************************************************************************
 *******************************************************************************
 
-## 11. 总结
+## 12. 总结
 
 ```
          Station发现SoftAP
@@ -274,7 +331,18 @@ Channel 11
       └─────────┬─────────┘
                 ↓
             Scan Results
-
+                ↓
+             Network Selection
+                ↓
+           Authentication
+                ↓
+            Association
+                ↓
+          4-Way Handshake
+                ↓
+               DHCP
+                ↓
+          IP Connectivity
 ```
 
 *******************************************************************************
