@@ -209,13 +209,13 @@ cat ~/.ssh/id_ed25519_github2.pub
 
 ```text
 # 账号一(默认):走 github.com
-Host github.com		/* 这里的 github.com 可以改成 github 账号名，便于区分 */
+Host username01		/* 这里的 github.com 可以改成 github 账号名，便于区分 */
   HostName github.com
   User git
   IdentityFile ~/.ssh/id_ed25519	/* 这里改为对应账号的key文件名 */
 
 # 账号二(本技术文章账号):走别名 github2
-Host github2
+Host username02
   HostName github.com
   User git
   IdentityFile ~/.ssh/id_ed25519_github2
@@ -241,8 +241,8 @@ Host github2
 ### 3.6 验证:两条 ssh -T 各归各位
 
 ```bash
-ssh -T git@github.com     # 预期:Hi 账号一登录名!
-ssh -T git@github2        # 预期:Hi 账号二登录名!
+ssh -T git@username01     # 预期:Hi 账号一登录名!
+ssh -T git@username02        # 预期:Hi 账号二登录名!
 ```
 
 `Hi` 后面的名字就是该密钥对应的**真实 GitHub 登录名**,以此为准。两条都返回各自账号的名字,路由就配置成功了。
@@ -279,11 +279,11 @@ git config --list    # 验证:仓库级值覆盖全局值
 
 ```bash
 # 新克隆:主机部分用别名,冒号后写真实登录名
-git clone git@github2:账号二登录名/仓库名.git
+git clone git@username02:账号二登录名/仓库名.git
 
 # 已克隆的仓库:切换远程地址
 cd ~/已有仓库目录
-git remote set-url origin git@github2:账号二登录名/仓库名.git
+git remote set-url origin git@username02:账号二登录名/仓库名.git
 git remote -v    # 验证
 ```
 
@@ -313,7 +313,7 @@ git remote set-url origin https://账号二登录名@github.com/账号二登录�
 
 ```bash
 git remote -v                 # 主机部分是哪个别名?冒号后是哪个账号名?
-ssh -T git@github.com         # 默认密钥对应哪个账号?
+ssh -T git@username01         # 默认密钥对应哪个账号?
 ssh -T git@别名                # 新账号密钥对应哪个账号?
 ```
 
@@ -356,12 +356,12 @@ git push -u origin main
 
 ```bash
 cd ~
-git clone git@github.com:你的GitHub用户名/tech-notes.git
+git clone git@username01:你的GitHub用户名/tech-notes.git
 cd tech-notes
 ```
 
 - 地址必须与网页上建的仓库名**完全一致**(含大小写),仓库页面上有绿色的 Code 按钮,可以直接复制 SSH 地址;
-- 多账号用户:把地址中的 `github.com` 换成第三章配置的别名,如 `git@github2:你的用户名/tech-notes.git`,确保用新账号的密钥连接;
+- 多账号用户:把地址中的 `github.com` 换成第三章配置的别名,如 `git@username02:你的用户名/tech-notes.git`,确保用新账号的密钥连接;
 - 用 HTTPS 方式的,复制 HTTPS 地址;
 - 克隆完成后,`~/tech-notes` 就是一个普通的本地文件夹,仓库的全部内容都在里面。
 

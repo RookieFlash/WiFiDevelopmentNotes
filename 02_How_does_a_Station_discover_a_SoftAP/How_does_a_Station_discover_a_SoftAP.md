@@ -5,9 +5,13 @@
 
 > 打开手机 Wi-Fi，很快就能看到附近的 Wi-Fi 列表，那么手机是怎么发现附近 Wi-Fi的？
 
+
 简单来说，手机有 主动扫描 + 被动扫描/监听 两种方式来发现附近的热点。
+
 主动扫描：手机在支持的信道上轮询发送 Probe Request，等待 SoftAP 回复 Probe Response 主动发现附近的 Wi-Fi热点。
+
 被动扫描：手机在支持的信道上轮询监听 SoftAP 周期性广播的 Beacon 来发现 Wi-Fi热点。
+
 
 ```
 STA 想发现 SoftAP
@@ -63,8 +67,11 @@ Beacon 可以理解成 SoftAP 周期性发送一张“自我介绍”。例如�
 ```
 
 SoftAP 会按照 Beacon Interval 周期性发送 Beacon Frame。
+
 Beacon Interval 的单位是 TU（Time Unit），常见配置为 100 TU，也就是约 102.4 ms。
+
 STA 可以通过接收到的 Beacon 了解附近 BSS 的基本信息。
+
 ```
 1 TU = 1024 μs
 
